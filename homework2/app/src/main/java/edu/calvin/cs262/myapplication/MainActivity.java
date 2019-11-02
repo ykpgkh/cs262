@@ -13,17 +13,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String> {
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
-
-    private EditText mBookInput;
-    private TextView mTitleText;
-    private TextView mAuthorText;
+    RadioGroup protocol;
+    private EditText websiteURL;
+    private TextView pageSourceText;
     TextView tv;
 
 
@@ -34,19 +31,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mBookInput = (EditText)findViewById(R.id.bookInput);
-        mTitleText = (TextView)findViewById(R.id.titleText);
-        mAuthorText = (TextView)findViewById(R.id.authorText);
-
-        if(getSupportLoaderManager().getLoader(0)!=null){
-            getSupportLoaderManager().initLoader(0,null,this);
-        }
+        websiteURL = findViewById(R.id.websiteInput);
+        pageSourceText = findViewById(R.id.pageSourceText);
     }
 
-    public void searchBooks(View view) {
+    public void getPageSource(View view) {
 
         //Get the search string from the input field.
-        String queryString = mBookInput.getText().toString();
+        String urlString = websiteURL.getText().toString();
+//        int protocolType = protocol.getCheckedRadioButtonId();
 
         InputMethodManager inputManager = (InputMethodManager)
                 getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -63,21 +56,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             networkInfo = connMgr.getActiveNetworkInfo();
         }
 
-        //launch the background task with the execute() method and the query string
+        // If user has given input and we are connected to network
         if (networkInfo != null && networkInfo.isConnected()
-                && queryString.length() != 0) {
+                && urlString.length() != 0 ) {
+
+            // Combine protocol string with user typed url to create final url
+//            String finalSearchString = protocolType + (urlString);
             Bundle queryBundle = new Bundle();
-            queryBundle.putString("queryString", queryString);
+            queryBundle.putString("urlString", null);
+//            queryBundle.putString("urlString", finalSearchString);
+
+            // Restart loader to get results
             getSupportLoaderManager().restartLoader(0, queryBundle, this);
-            mAuthorText.setText("");
-            mTitleText.setText(R.string.loading);
+
+            pageSourceText.setText("Loading...");
+
+            // No search term or no network
         } else {
-            if (queryString.length() == 0) {
-                mAuthorText.setText("");
-                mTitleText.setText(R.string.no_search_term);
+            if (urlString.length() == 0) {
+                pageSourceText.setText("");
             } else {
-                mAuthorText.setText("");
-                mTitleText.setText(R.string.no_network);
+                pageSourceText.setText("Check your network connection.");
             }
         }
     }
@@ -85,115 +84,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @NonNull
     @Override
     public Loader<String> onCreateLoader(int id, @Nullable Bundle args) {
-        String queryString = "";
+        String urlSource = "";
 
-        if (args != null) {
-            queryString = args.getString("queryString");
-        }
+        if (args != null) { urlSource = args.getString("urlString"); }
 
-        return new sLoader(this, queryString);
+        return new sLoader(this, urlSource);
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader loader, Object data) {
-        try {
-            JSONObject jsonObject = new JSONObject((String) data);
-            JSONArray itemsArray = jsonObject.getJSONArray("items");
+    public void onLoadFinished(@NonNull Loader<String> loader, String data) {
+            String results = data;
+            if (results != null) {
+                pageSourceText.setText(results);
 
-            //initialize the variables used for the parsing loop
-            int i = 0;
-            String title = null;
-            String authors = null;
-
-            while (i < itemsArray.length() &&
-                    (authors == null && title == null)) {
-                // Get the current item information.
-                JSONObject book = itemsArray.getJSONObject(i);
-                JSONObject volumeInfo = book.getJSONObject("volumeInfo");
-
-                // Try to get the author and title from the current item,
-                // catch if either field is empty and move on.
-                try {
-                    title = volumeInfo.getString("title");
-                    authors = volumeInfo.getString("authors");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // Move to the next item.
-                i++;
-            }
-
-            if (title != null && authors != null) {
-                mTitleText.setText(title);
-                mAuthorText.setText(authors);
-
-            }
-
-            else {
-                mTitleText.setText(R.string.no_results);
-                mAuthorText.setText("");
-
-            }
-
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            //obtain the JSON array of items from the result string
-            JSONObject jsonObject = new JSONObject((String) data);
-            JSONArray itemsArray = jsonObject.getJSONArray("items");
-
-            //initialize the variables used for the parsing loop
-            int i = 0;
-            String title = null;
-            String authors = null;
-
-            //iterate through the itemsArray array, checking each book for title and author information
-            //Only entries with both a title and author will be displayed
-            while (i < itemsArray.length() &&
-                    (authors == null && title == null)) {
-                // Get the current item information.
-                JSONObject book = itemsArray.getJSONObject(i);
-                JSONObject volumeInfo = book.getJSONObject("volumeInfo");
-
-                // Try to get the author and title from the current item,
-                // catch if either field is empty and move on.
-                try {
-                    title = volumeInfo.getString("title");
-                    authors = volumeInfo.getString("authors");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // Move to the next item.
-                i++;
-            }
-            //if a matching response is found, update the UI with that response.
-            if (title != null && authors != null) {
-
-
-                //if the loop has stopped and the result has no items with both a valid author
-                //and a valid title
+                // no valid response
             } else {
-
+                pageSourceText.setText("");
             }
-        } catch (Exception e) {
-            // If onPostExecute does not receive a proper JSON string,
-            // update the UI to show failed results.
 
-            e.printStackTrace();
-        }
     }
 
-
-
-
     @Override
-    public void onLoaderReset(@NonNull Loader loader) {
+    public void onLoaderReset(@NonNull Loader<String> loader) {
 
     }
 }

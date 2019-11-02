@@ -11,16 +11,16 @@
         android:id="@+id/instructions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enter URL:"
+        android:text="@string/Enter_url"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/bookInput"
+        android:id="@+id/websiteInput"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:hint="www.example.com"
+        android:hint="@string/www_example_com"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -32,10 +32,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
-        android:onClick="searchBooks"
-        android:text="GET PAGE SOURCE"
+        android:onClick="getPageSource"
+        android:text="@string/get_page_source"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bookInput" />
+        app:layout_constraintTop_toBottomOf="@+id/websiteInput" />
 
     <TextView
         android:id="@+id/titleText"
@@ -67,7 +67,7 @@
         android:layout_marginStart="3dp"
         android:layout_marginLeft="3dp"
         app:layout_constraintBottom_toTopOf="@+id/searchButton"
-        app:layout_constraintEnd_toStartOf="@+id/bookInput"
+        app:layout_constraintEnd_toStartOf="@+id/websiteInput"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/instructions"
@@ -87,6 +87,7 @@
     </RadioGroup>
 
     <ScrollView
+        android:id="@+id/websiteSource"
         android:layout_width="377dp"
         android:layout_height="521dp"
         android:layout_marginEnd="2dp"
@@ -94,13 +95,17 @@
         android:layout_marginBottom="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchButton">
+        app:layout_constraintTop_toBottomOf="@+id/searchButton"
+        app:layout_constraintVertical_bias="0.0">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/pageSourceText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:text="" />
+
     </ScrollView>
 
 
