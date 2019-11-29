@@ -1,0 +1,10 @@
+Got an error saying that I need to set 'android.defaultConfig.vectorDrawables.useSupportLibrary = true'
+     I didn't change it as the code work as intended without needing to change it.
+
+
+Got 21 typos but upon further inspection, none of them were really spelling mistakes so they were left as is.
+
+Unused XML schema declaration. I followed the suggestion, and deleted the xml file that wasn't being used.
+
+I got various suggestions to update the build gradle dependencies. I followed the recommendation to update them
+     as it was a simple fix, and there really wasn't a reason to leave them on outdated dependencies.
